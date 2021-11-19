@@ -9,7 +9,7 @@ klasses = [
 ]
 
 
-class_gen = ((tutor, klass) for tutor, klass in zip_longest(set(tutors), set(klasses)))
+class_gen = ((tutor, klass) for tutor, klass in zip_longest(set(tutors), set(klasses)) if tutor is not None)
 
 print(next(class_gen))
 print(next(class_gen))
