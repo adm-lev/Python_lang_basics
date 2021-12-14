@@ -8,13 +8,12 @@ class LottoGame:
     """ Сеанс игры в лото с игроками и карточками"""
     def __init__(self):
         self.players_num = 2
-        self.names = []                         # список с экзеплярами игроков
         self.bag1 = self.add_bag()
         self.computer = None
         self.human = None
         self.main()
 
-    def main(self):
+    def main(self):                                            # функция выполняет весь процесс партии игры
         print(f'Здравствуйте! Вас приветствует игра ЛОТО!')
 
         self.human = self.add_player(self.get_name(), False)
@@ -32,7 +31,7 @@ class LottoGame:
             self.check_win()
 
     @staticmethod
-    def get_name():
+    def get_name():                                           # функция проверяет корректноть имени игрока
         print('Пожалуйста, введите ваше имя: ')
         while True:
             name = input()
@@ -41,18 +40,18 @@ class LottoGame:
             else:
                 return name
 
-    def check_win(self):
+    def check_win(self):                                      # функция проверяет, нет ли сейчас победителей
         if not re.search(r'\d+', self.human.card.card_numbers):
             return self.human.win()
         elif not re.search(r'\d+', self.computer.card.card_numbers):
             return self.computer.win()
 
     @staticmethod
-    def add_bag():
+    def add_bag():                                            # создание экземпляры сумки
         return Bag()
 
     @staticmethod
-    def add_player(name, ai=False):
+    def add_player(name, ai=False):                           # создание экземплра игрока
 
         if ai:
             return Computer(name)
@@ -66,14 +65,14 @@ class Card:
     def __init__(self, name):
         self.card_numbers = '-' * 10 + name + '-' * 10 + '\n' + self.__fill_card() + '\n' + '-' * 30
 
-    def show_card(self):
+    def show_card(self):                                      # функция рисует карточку
         return print(self.card_numbers)
 
     def __str__(self):
         return self.card_numbers
 
     @staticmethod
-    def __fill_card():
+    def __fill_card():                                        # функция заполняет карточку случайными числами
         numbers = [i for i in range(1, 91)]
         shuffle(numbers)
         front = [sorted(numbers[:5]), sorted(numbers[5:10]), sorted(numbers[10:15])]
@@ -93,12 +92,12 @@ class Bag:
         self.numbers = self.__fill_bag()
 
     @staticmethod
-    def __fill_bag():
+    def __fill_bag():                                          # сумка заполняется бочонками
         numbers = [i for i in range(1, 91)]
         shuffle(numbers)
         return numbers
 
-    def get_barrel(self):
+    def get_barrel(self):                                      # случайный бочонок достается из сумки
         return str(self.numbers.pop())
 
 
@@ -112,18 +111,18 @@ class Player(ABC):
               f'и вытащил карточку:\n {self.card}')
 
     @abstractmethod
-    def mark_field(self, value):
+    def mark_field(self, value):                               # функция зачеркивает число на карточке
         pass
 
     @staticmethod
-    def __get_card(name):
+    def __get_card(name):                                       # функция вручает игроку новую карточку
         return Card(name)
 
-    def win(self):
+    def win(self):                                              # игрок почеждает при вызове функции
         print(f'Мои поздравления!!!\n {self.__name} первым закрывает все числа и побеждает в игре!')
         sys.exit()
 
-    def loose(self):
+    def loose(self):                                            # игрок проигрывает при вызове функции
         print(f'К сожалению, вы проиграли, {self.__name}!')
         sys.exit()
 
