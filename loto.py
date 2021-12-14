@@ -1,5 +1,5 @@
 import sys
-from random import shuffle
+from random import shuffle, randint
 from abc import ABC, abstractmethod
 import re
 
@@ -17,8 +17,7 @@ class LottoGame:
     def main(self):
         print(f'Здравствуйте! Вас приветствует игра ЛОТО!')
 
-        human_name = input('Введите ваше имя: ')
-        self.human = self.add_player(human_name, False)
+        self.human = self.add_player(self.get_name(), False)
         self.computer = self.add_player('Вассерман', True)
 
         while True:
@@ -31,6 +30,16 @@ class LottoGame:
             self.human.card.show_card()
             self.computer.card.show_card()
             self.check_win()
+
+    @staticmethod
+    def get_name():
+        print('Пожалуйста, введите ваше имя: ')
+        while True:
+            name = input()
+            if re.search(r'\d+', name):
+                print('Пожалуйста, введите имя без чисел!: \n')
+            else:
+                return name
 
     def check_win(self):
         if not re.search(r'\d+', self.human.card.card_numbers):
@@ -67,10 +76,14 @@ class Card:
     def __fill_card():
         numbers = [i for i in range(1, 91)]
         shuffle(numbers)
-        front = [numbers[:5], numbers[5:10], numbers[10:15]]
-        list(map(lambda x: x.extend([0, 0, 0]), front))
-        list(map(shuffle, front))
-        front = '\n'.join([' '.join(map(str, line)) for line in front]).replace('0', '\t')
+        front = [sorted(numbers[:5]), sorted(numbers[5:10]), sorted(numbers[10:15])]
+        for line in front:
+            i = 3
+            while i:
+                line.insert(randint(0, len(line)), '\t')
+                i -= 1
+
+        front = '\n'.join([' '.join(map(str, line)) for line in front])
         return front
 
 
@@ -119,15 +132,21 @@ class Human(Player):
 
     def mark_field(self, value):
         key = re.compile(fr'(?<=\s){value}(?=\s)')
-        choice = input(f'есть ли такой номер в вашей карточке? y/n:  ')
-        if choice == 'n':
-            if re.search(key, self.card.card_numbers):
-                self.loose()
-        elif choice == 'y':
-            if not re.search(key, self.card.card_numbers):
-                self.loose()
+        while True:
+            choice = input(f'есть ли такой номер в вашей карточке? y/n:  ')
+            if choice.lower() == 'n':
+                if re.search(key, self.card.card_numbers):
+                    self.loose()
+                else:
+                    break
+            elif choice.lower() == 'y':
+                if not re.search(key, self.card.card_numbers):
+                    self.loose()
+                else:
+                    self.card.card_numbers = re.sub(key, 'X', self.card.card_numbers)
+                    break
             else:
-                self.card.card_numbers = re.sub(key, 'X', self.card.card_numbers)
+                print('недопустимый символ!')
 
 
 class Computer(Player):
